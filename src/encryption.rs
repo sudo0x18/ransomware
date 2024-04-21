@@ -33,13 +33,7 @@ pub fn encrypt(source_file_path: CString, dest_file_path: CString) -> bool {
             CRYPT_VERIFYCONTEXT,
         ) == 0
         {
-            println!(
-                "Error during CryptAcquireContext! Error code: {}",
-                GetLastError()
-            );
             return false;
-        } else {
-            println!("A cryptographic provider has been acquired.");
         }
 
         if CryptImportKey(
@@ -51,10 +45,7 @@ pub fn encrypt(source_file_path: CString, dest_file_path: CString) -> bool {
             &mut key_handle,
         ) == 0
         {
-            println!("Failed to import key. Error code: {:?}", GetLastError());
             return false;
-        } else {
-            println!("Import successful. Key handle: 0x{:x}", key_handle);
         }
 
         let block_size: u32 = 960;
@@ -62,7 +53,6 @@ pub fn encrypt(source_file_path: CString, dest_file_path: CString) -> bool {
 
         let mut buffer: Vec<u8> = Vec::new();
         buffer.resize(buffer_size as usize, 0u8);
-        println!("Memory allocated for the buffer.");
 
         let source_handle: HANDLE = CreateFileA(
             source_file_path.as_ptr(),
@@ -96,7 +86,6 @@ pub fn encrypt(source_file_path: CString, dest_file_path: CString) -> bool {
                 null_mut(),
             ) == 0
             {
-                println!("Error reading from source file.");
                 break;
             }
             if bytes_read < block_size {
@@ -113,7 +102,6 @@ pub fn encrypt(source_file_path: CString, dest_file_path: CString) -> bool {
                 buffer_size,
             ) == 0
             {
-                println!("Failed to encrypt. Error code: {:?}", GetLastError());
                 break;
             }
 
@@ -125,7 +113,6 @@ pub fn encrypt(source_file_path: CString, dest_file_path: CString) -> bool {
                 null_mut(),
             ) == 0
             {
-                println!("Failed to write to destination file.");
                 break;
             }
         }
@@ -150,11 +137,7 @@ pub fn decrypt(source_file_path: CString, dest_file_path: CString) -> bool {
             CRYPT_VERIFYCONTEXT,
         ) == 0
         {
-            println!("Error during CryptAcquireContext!");
-            println!("Error code: {}", GetLastError());
             return false;
-        } else {
-            println!("A cryptographic provider has been acquired.");
         }
 
         if CryptImportKey(
@@ -166,10 +149,7 @@ pub fn decrypt(source_file_path: CString, dest_file_path: CString) -> bool {
             &mut key_handle,
         ) == 0
         {
-            println!("Import failed. Error code: {:?}", GetLastError());
             return false;
-        } else {
-            println!("Import successful. Key handle: {}", key_handle);
         }
 
         let source_handle: HANDLE = CreateFileA(
@@ -210,10 +190,8 @@ pub fn decrypt(source_file_path: CString, dest_file_path: CString) -> bool {
                 null_mut(),
             ) == 0
             {
-                println!("Error reading. Error code: 0x{:x}", GetLastError());
                 break;
             }
-            println!("Bytes read: {}", bytes_read);
             if bytes_read < block_size {
                 end_of_file = 1;
             }
@@ -227,7 +205,6 @@ pub fn decrypt(source_file_path: CString, dest_file_path: CString) -> bool {
                 &mut bytes_read,
             ) == 0
             {
-                println!("Failed to decrypt. Error code: 0x{:x}", GetLastError());
                 break;
             }
 
@@ -239,7 +216,6 @@ pub fn decrypt(source_file_path: CString, dest_file_path: CString) -> bool {
                 null_mut(),
             ) == 0
             {
-                println!("Failed to write to destination file.");
                 break;
             }
         }
@@ -270,10 +246,8 @@ pub fn get_aes_key_handle(crypto_provider_handle: HCRYPTPROV, aes_key_blob: &[u8
             &mut key_handle,
         ) == 0
         {
-            println!("Failed to import key. Error code: {:?}", GetLastError());
             None
         } else {
-            println!("Import successful. Key handle: {}", key_handle);
             Some(key_handle)
         }
     }
@@ -314,11 +288,8 @@ pub fn decrypt_and_write_file(
                 null_mut(),
             ) == 0
             {
-                println!("Error reading from source file. Error code: 0x{:x}", GetLastError());
                 return false;
             }
-
-            println!("Bytes read: {}", bytes_read);
 
             if bytes_read < block_size {
                 end_of_file = 1;
@@ -333,7 +304,6 @@ pub fn decrypt_and_write_file(
                 &mut bytes_read,
             ) == 0
             {
-                println!("Failed to decrypt. Error code: 0x{:x}", GetLastError());
                 return false;
             }
 
@@ -345,7 +315,6 @@ pub fn decrypt_and_write_file(
                 null_mut(),
             ) == 0
             {
-                println!("Failed to write to destination file.");
                 return false;
             }
         }

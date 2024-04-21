@@ -6,7 +6,7 @@ import os
 class RansomwareApp(tk.Tk):
     def __init__(self, file_path):
         tk.Tk.__init__(self)
-        self.title("Peter's Ransomware")
+        self.title("Rusty Ransomware")
         self.configure(bg='red')
         self.geometry("600x400")
         self.file_path = file_path
@@ -38,7 +38,7 @@ class RansomwareApp(tk.Tk):
             "What happened to my computer?\n"
             "All your important personal files have been encrypted,\n"
             "and all of these documents are no longer accessible.\n\n"
-            "Please pay $69 for us to decrypt your files :P"
+            "Please pay $1000 for us to decrypt your files :J"
         )
         self.note_label = tk.Label(self.note_frame, text=note_text, bg="white", fg="black", font=("Comic Sans MS", 12))
         self.note_label.pack(pady=20, padx=40, fill=tk.BOTH)
