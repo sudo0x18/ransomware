@@ -28,7 +28,7 @@ class RansomwareApp(tk.Tk):
         self.upper_frame = tk.Frame(self, bg="red")
         self.upper_frame.pack(fill=tk.X)
 
-        self.oops_label = tk.Label(self.upper_frame, text="Oops! Your files have been encrypted.", bg='red', fg="white", font=("Comic Sans MS", 16))
+        self.oops_label = tk.Label(self.upper_frame, text="Oops! Your files have been encrypted.", bg='red', fg="white", font=("Arial", 16))
         self.oops_label.pack(pady=20)
 
         self.note_frame = tk.Frame(self, bg="white")
@@ -40,20 +40,20 @@ class RansomwareApp(tk.Tk):
             "and all of these documents are no longer accessible.\n\n"
             "Please pay $1000 for us to decrypt your files :J"
         )
-        self.note_label = tk.Label(self.note_frame, text=note_text, bg="white", fg="black", font=("Comic Sans MS", 12))
+        self.note_label = tk.Label(self.note_frame, text=note_text, bg="white", fg="black", font=("Arial", 12))
         self.note_label.pack(pady=20, padx=40, fill=tk.BOTH)
 
         self.info_frame = tk.Frame(self, bg="red")
         self.info_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
         delete_date_text = "Your files will be lost on\n{}".format(self.delete_date)
-        self.delete_date_label = tk.Label(self.info_frame, text=delete_date_text, bg="red", fg="black", font=("Comic Sans MS", 18, "bold"))
+        self.delete_date_label = tk.Label(self.info_frame, text=delete_date_text, bg="red", fg="black", font=("Arial", 18, "bold"))
         self.delete_date_label.pack(pady=20)
 
-        self.time_left_label = tk.Label(self.info_frame, text="Time Left", bg="red", fg="black", font=("Comic Sans MS", 18, "bold"))
+        self.time_left_label = tk.Label(self.info_frame, text="Time Left", bg="red", fg="black", font=("Arial", 18, "bold"))
         self.time_left_label.pack(pady=10)
 
-        self.time_label = tk.Label(self.info_frame, text="", bg="red", fg="black", font=("Comic Sans MS", 18, "bold"))
+        self.time_label = tk.Label(self.info_frame, text="", bg="red", fg="black", font=("Arial", 18, "bold"))
         self.time_label.pack(pady=10)
 
         self.update_clock()
